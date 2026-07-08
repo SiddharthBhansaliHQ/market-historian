@@ -1,0 +1,19 @@
+name: Analyze Code
+
+on: [push]
+
+jobs:
+  analyze-code:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v7
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+
+    - name: Analyze Code
+      run: |
+        chmod +x .github/scripts/analyze_code.sh
+        ./.github/scripts/analyze_code.sh
