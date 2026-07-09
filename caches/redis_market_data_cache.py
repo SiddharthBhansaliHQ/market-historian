@@ -15,9 +15,7 @@ class RedisMarketDataCache(BaseMarketDataCache):
     async def get(
         self, symbol: str, date_range: DateRange
     ) -> list[MarketDataUnit] | None:
-        lookup: bytes | str | None = await self._redis_client.get(
-            self._generate_key(symbol, date_range)
-        )
+        lookup = await self._redis_client.get(self._generate_key(symbol, date_range))
 
         if lookup is None:
             return None

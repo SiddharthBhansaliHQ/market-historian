@@ -15,15 +15,15 @@ class TiingoMarketDataClient(BaseMarketDataClient):
 
     @override
     async def fetch(self, symbol: str, date_range: DateRange) -> list[MarketDataUnit]:
-        symbol_market_data: list[MarketDataUnit] = []
-        url: str = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices"
+        symbol_market_data = []
+        url = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices"
 
-        headers: dict[str, str] = {
+        headers = {
             "Content-Type": "application/json",
             "Authorization": f"Token {self._api_key}",
         }
 
-        params: dict[str, str] = {
+        params = {
             "startDate": str(date_range.start_date),
             "endDate": str(date_range.end_date),
         }

@@ -17,7 +17,7 @@ async def create_market_data_cache(config: dict[str, str]) -> BaseMarketDataCach
 async def create_market_data_client(
     config: dict[str, str],
 ) -> BaseMarketDataClient:
-    http_client: aiohttp.ClientSession = aiohttp.ClientSession()
+    http_client = aiohttp.ClientSession()
 
     if config["type"] == "tiingo":
         return TiingoMarketDataClient(http_client, config["api_key"])
