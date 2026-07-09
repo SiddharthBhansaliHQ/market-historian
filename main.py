@@ -13,14 +13,13 @@ import factories.market_data_factory
 from caches.base_market_data_cache import BaseMarketDataCache
 from clients.base_market_data_client import BaseMarketDataClient
 from models.date_range import DateRange
-from models.market_data_unit import MarketDataUnit
 from models.security_statistics import SecurityStatistics
 from services import calculation_service, market_data_service
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
-MARKET_DATA_CACHE: BaseMarketDataCache | None = None
-MARKET_DATA_CLIENT: BaseMarketDataClient | None = None
-SETTINGS: config.Settings = config.Settings()
+MARKET_DATA_CACHE = None
+MARKET_DATA_CLIENT = None
+SETTINGS = config.Settings()
 
 
 @asynccontextmanager
@@ -58,14 +57,12 @@ def get_market_data_client() -> BaseMarketDataClient:
 
 
 @app.post("/statistics")
-async def compute_statistics(
+async def compute_security_statistics(
     payload: Annotated[dict[str, DateRange], Field(min_length=1, max_length=5)],
     market_data_client: BaseMarketDataClient = Depends(get_market_data_client),
     market_data_cache: BaseMarketDataCache = Depends(get_market_data_cache),
 ) -> dict[str, SecurityStatistics]:
-    market_data: dict[
-        str, list[MarketDataUnit]
-    ] = await market_data_service.collect_market_data(
+    market_data = await market_data_service.collect_market_data(
         market_data_client, market_data_cache, payload
     )
 
