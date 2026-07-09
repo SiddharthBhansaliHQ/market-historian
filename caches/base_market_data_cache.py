@@ -1,22 +1,27 @@
 from abc import ABC, abstractmethod
-from datetime import date
+
+from pydantic import TypeAdapter
 
 from models.date_range import DateRange
 from models.market_data_unit import MarketDataUnit
 
 
 class BaseMarketDataCache(ABC):
+    _TYPE_ADAPTER: TypeAdapter[list[MarketDataUnit]] = TypeAdapter(
+        TypeAdapter[list[MarketDataUnit]]
+    )
+
     @abstractmethod
     async def get(
         self, symbol: str, date_range: DateRange
-    ) -> dict[date, MarketDataUnit] | None: ...
+    ) -> list[MarketDataUnit] | None: ...
 
     @abstractmethod
     async def set(
         self,
         symbol: str,
         date_range: DateRange,
-        value: dict[date, MarketDataUnit],
+        value: list[MarketDataUnit],
     ) -> None: ...
 
     @abstractmethod
