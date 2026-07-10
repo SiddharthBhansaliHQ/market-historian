@@ -90,9 +90,9 @@ def get_annualized_log_sharpe_ratio_rf_zero(
     symbol_market_data: list[MarketDataUnit],
 ) -> float:
     numerator = get_annualized_log_rate_of_return(symbol_market_data)
-    denomenator = get_annualized_log_volatility(symbol_market_data)
+    denominator = get_annualized_log_volatility(symbol_market_data)
 
-    if numerator == math.nan or denomenator == math.nan or denomenator == 0.0:
+    if numerator == math.nan or denominator == math.nan or denominator == 0.0:
         return math.nan
 
-    return numerator / denomenator
+    return numerator / denominator
