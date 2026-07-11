@@ -1,1 +1,1 @@
-cat .gitignore > .dockerignore && echo "\n# Git\n.git/" >> .dockerignore
+cat .gitignore > .dockerignore && echo "\n# Git\n.git" >> .dockerignore
