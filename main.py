@@ -40,7 +40,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await MARKET_DATA_CLIENT.close()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url="/",
+    openapi_url="/openapi.json",
+    title="Market Historian",
+)
 
 
 def get_market_data_cache() -> BaseMarketDataCache:
