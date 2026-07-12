@@ -128,10 +128,7 @@ def test_payload_max_size_happy_path(
         ]
     )
 
-    assert (
-        mock_market_data_cache.set.await_count
-        == mock_market_data_client.fetch.await_count
-    )
+    assert mock_market_data_cache.set.await_count == 3
     mock_market_data_cache.set.assert_has_awaits(
         [
             call(
