@@ -6,7 +6,7 @@ from datetime import date
 from typing import Annotated, AsyncGenerator
 
 import certifi
-from fastapi import Body, Depends, FastAPI
+from fastapi import Depends, FastAPI
 from pydantic import Field
 
 import config
@@ -43,7 +43,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     lifespan=lifespan,
     docs_url="/",
-    openapi_url="/openapi.json",
     title="Market Historian",
 )
 
@@ -64,24 +63,29 @@ def get_market_data_client() -> BaseMarketDataClient:
 
 @app.post("/statistics")
 async def compute_security_statistics(
-    payload: Annotated[dict[str, DateRange], Field(min_length=1, max_length=5)] = Body(
-        examples=[
-            {
-                "NVDA": DateRange(
-                    start_date=date(2020, 2, 28), end_date=date(2026, 4, 17)
-                ),
-                "TSLA": DateRange(
-                    start_date=date(2016, 7, 14), end_date=date(2022, 3, 1)
-                ),
-                "VTI": DateRange(
-                    start_date=date(2002, 12, 2), end_date=date(2019, 6, 25)
-                ),
-                "SPY": DateRange(
-                    start_date=date(2010, 8, 9), end_date=date(2017, 11, 13)
-                ),
-            }
-        ]
-    ),
+    payload: Annotated[
+        dict[Annotated[str, Field(min_length=1)], DateRange],
+        Field(
+            min_length=1,
+            max_length=5,
+            examples=[
+                {
+                    "NVDA": DateRange(
+                        start_date=date(2020, 2, 28), end_date=date(2026, 4, 17)
+                    ),
+                    "TSLA": DateRange(
+                        start_date=date(2016, 7, 14), end_date=date(2022, 3, 1)
+                    ),
+                    "VTI": DateRange(
+                        start_date=date(2002, 12, 2), end_date=date(2019, 6, 25)
+                    ),
+                    "SPY": DateRange(
+                        start_date=date(2010, 8, 9), end_date=date(2017, 11, 13)
+                    ),
+                }
+            ],
+        ),
+    ],
     market_data_client: BaseMarketDataClient = Depends(get_market_data_client),
     market_data_cache: BaseMarketDataCache = Depends(get_market_data_cache),
 ) -> dict[str, SecurityStatistics]:

@@ -1,9 +1,9 @@
-name: Analyze Code
+name: Check Code Quality
 
 on: [push]
 
 jobs:
-  analyze-code:
+  check-code-quality:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,7 +15,7 @@ jobs:
       with:
         python-version: '3.13'
 
-    - name: Analyze Code
+    - name: Check Code Quality
       run: |
-        chmod +x .github/scripts/analyze_code.sh
-        ./.github/scripts/analyze_code.sh
+        chmod +x .github/scripts/check_code_quality.sh
+        ./.github/scripts/check_code_quality.sh

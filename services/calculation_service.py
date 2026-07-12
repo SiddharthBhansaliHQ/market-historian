@@ -32,7 +32,7 @@ def calculate_security_statistics(
 
 
 def get_rate_of_return(symbol_market_data: list[MarketDataUnit]) -> float:
-    if (len(symbol_market_data)) < 1:
+    if len(symbol_market_data) < 1:
         return math.nan
 
     start_price = symbol_market_data[0].adjusted_close
@@ -47,7 +47,7 @@ def get_rate_of_return(symbol_market_data: list[MarketDataUnit]) -> float:
 def get_annualized_log_rate_of_return(
     symbol_market_data: list[MarketDataUnit],
 ) -> float:
-    if (len(symbol_market_data)) < 1:
+    if len(symbol_market_data) < 1:
         return math.nan
 
     start_price = symbol_market_data[0].adjusted_close
