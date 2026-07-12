@@ -36,5 +36,5 @@ async def collect_market_data(
             cache.set(symbol_and_date_range[0], symbol_and_date_range[1], api_result)
         )
 
-    asyncio.gather(*cache_updates)
+    await asyncio.gather(*cache_updates)
     return market_data
