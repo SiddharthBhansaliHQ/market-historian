@@ -19,26 +19,31 @@ from models.security_statistics import SecurityStatistics
 from services import calculation_service, market_data_service
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
-MARKET_DATA_CACHE = None
-MARKET_DATA_CLIENT = None
-SETTINGS = config.Settings()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    global MARKET_DATA_CACHE, MARKET_DATA_CLIENT
-
-    MARKET_DATA_CACHE = await factories.market_data_factory.create_market_data_cache(
-        SETTINGS.market_data_cache_config
+    app.state.settings = config.Settings()
+    app.state.process_pool_executor = ProcessPoolExecutor(
+        mp_context=multiprocessing.get_context("spawn")
     )
-    MARKET_DATA_CLIENT = await factories.market_data_factory.create_market_data_client(
-        SETTINGS.market_data_client_config
+
+    app.state.market_data_cache = (
+        await factories.market_data_factory.create_market_data_cache(
+            app.state.settings.market_data_cache_config
+        )
+    )
+    app.state.market_data_client = (
+        await factories.market_data_factory.create_market_data_client(
+            app.state.settings.market_data_client_config
+        )
     )
 
     yield
 
-    await MARKET_DATA_CACHE.close()
-    await MARKET_DATA_CLIENT.close()
+    app.state.process_pool_executor.shutdown(wait=True)
+    await app.state.market_data_cache.close()
+    await app.state.market_data_client.close()
 
 
 app = FastAPI(
@@ -49,17 +54,11 @@ app = FastAPI(
 
 
 def get_market_data_cache() -> BaseMarketDataCache:
-    if MARKET_DATA_CACHE is None:
-        raise RuntimeError("Failed to initialize market data cache.")
-    else:
-        return MARKET_DATA_CACHE
+    return app.state.market_data_cache
 
 
 def get_market_data_client() -> BaseMarketDataClient:
-    if MARKET_DATA_CLIENT is None:
-        raise RuntimeError("Failed to initialize market data client.")
-    else:
-        return MARKET_DATA_CLIENT
+    return app.state.market_data_client
 
 
 @app.post("/statistics")
@@ -94,10 +93,8 @@ async def compute_security_statistics(
         market_data_client, market_data_cache, payload
     )
 
-    loop = asyncio.get_running_loop()
-    ctx = multiprocessing.get_context("spawn")
-
-    with ProcessPoolExecutor(mp_context=ctx) as executor:
-        return await loop.run_in_executor(
-            executor, calculation_service.calculate_security_statistics, market_data
-        )
+    return await asyncio.get_running_loop().run_in_executor(
+        app.state.process_pool_executor,
+        calculation_service.calculate_security_statistics,
+        market_data,
+    )
