@@ -1,4 +1,5 @@
 import asyncio
+import multiprocessing
 import os
 from concurrent.futures import ProcessPoolExecutor
 from contextlib import asynccontextmanager
@@ -94,8 +95,9 @@ async def compute_security_statistics(
     )
 
     loop = asyncio.get_running_loop()
+    ctx = multiprocessing.get_context("spawn")
 
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(mp_context=ctx) as executor:
         return await loop.run_in_executor(
             executor, calculation_service.calculate_security_statistics, market_data
         )
