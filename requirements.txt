@@ -1,4 +1,4 @@
-aiohttp[speedups]==3.14.1
 certifi==2026.6.17
 fastapi[standard]==0.139.0
+httpx2==2.5.0
 redis[hiredis]==8.0.1

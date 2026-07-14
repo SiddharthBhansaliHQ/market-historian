@@ -7,6 +7,7 @@ from datetime import date
 from typing import Annotated, AsyncGenerator
 
 import certifi
+import httpx2
 from fastapi import Depends, FastAPI
 from pydantic import Field
 
@@ -24,6 +25,7 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.state.settings = config.Settings()
+    app.state.http_client_async = httpx2.AsyncClient()
     app.state.process_pool_executor = ProcessPoolExecutor(
         mp_context=multiprocessing.get_context("spawn")
     )
@@ -35,15 +37,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
     app.state.market_data_client = (
         await factories.market_data_factory.create_market_data_client(
-            app.state.settings.market_data_client_config
+            app.state.settings.market_data_client_config, app.state.http_client_async
         )
     )
 
     yield
 
     app.state.process_pool_executor.shutdown(wait=True)
-    await app.state.market_data_cache.close()
-    await app.state.market_data_client.close()
+    await app.state.market_data_cache.aclose()
+    await app.state.http_client_async.aclose()
 
 
 app = FastAPI(

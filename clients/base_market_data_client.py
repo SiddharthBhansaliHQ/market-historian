@@ -9,6 +9,3 @@ class BaseMarketDataClient(ABC):
     async def fetch(
         self, symbol: str, date_range: DateRange
     ) -> list[MarketDataUnit]: ...
-
-    @abstractmethod
-    async def close(self) -> None: ...
