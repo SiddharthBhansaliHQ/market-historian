@@ -37,7 +37,7 @@ class RedisMarketDataCache(BaseMarketDataCache):
         )
 
     @override
-    async def close(self) -> None:
+    async def aclose(self) -> None:
         await self._redis_client.aclose()
 
     def _generate_key(self, symbol: str, date_range: DateRange) -> str:

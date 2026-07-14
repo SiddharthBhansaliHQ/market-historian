@@ -1,4 +1,4 @@
-import aiohttp
+import httpx2
 import redis
 
 from caches.base_market_data_cache import BaseMarketDataCache
@@ -15,11 +15,9 @@ async def create_market_data_cache(config: dict[str, str]) -> BaseMarketDataCach
 
 
 async def create_market_data_client(
-    config: dict[str, str],
+    config: dict[str, str], http_client_async: httpx2.AsyncClient
 ) -> BaseMarketDataClient:
-    http_client = aiohttp.ClientSession()
-
     if config["type"] == "tiingo":
-        return TiingoMarketDataClient(http_client, config["api_key"])
+        return TiingoMarketDataClient(http_client_async, config["api_key"])
     else:
         raise ValueError("Invalid market data client type.")
