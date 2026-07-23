@@ -1,4 +1,4 @@
-certifi==2026.6.17
-fastapi[standard]==0.139.0
-httpx2==2.5.0
+certifi==2026.7.22
+fastapi[standard]==0.139.2
+httpx2==2.7.0
 redis[hiredis]==8.0.1
